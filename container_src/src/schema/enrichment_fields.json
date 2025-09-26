@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "classification": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "class_name": { "type": "string" },
+          "score": { "type": "number" }
+        }
+      }
+    },
+    "named_entities": { "type": "array", "items": { "type": "string" } },
+    "sentiment": { "type": "object", "decription": "No format yet" }
+  },
+  "additionalProperties": true,
+  "description": "Due to additionalProperties field, there's no restriction on possible fields"
+}

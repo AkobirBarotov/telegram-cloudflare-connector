@@ -1,0 +1,36 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "telegram-cloudflare-connector",
+  "main": "src/index.js",
+  "compatibility_date": "2025-05-23",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true
+  },
+	"workers_dev": false,
+  "triggers": {
+    "crons": ["* * * * *"]
+  },
+
+  "containers": [
+    {
+      "class_name": "MyContainer",
+      "image": "./Dockerfile",
+      "max_instances": 1
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "class_name": "MyContainer",
+        "name": "CONTAINER"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "new_sqlite_classes": ["MyContainer"],
+      "tag": "v1"
+    }
+  ]
+}

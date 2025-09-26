@@ -1,0 +1,19 @@
+{
+	"name": "telegram-cloudflare-connector",
+	"private": true,
+	"scripts": {
+		"deploy": "wrangler deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"cf-typegen": "wrangler types"
+	},
+	"devDependencies": {
+		"@types/node": "^24.5.2",
+		"typescript": "5.8.3",
+		"wrangler": "^4.40.2"
+	},
+	"dependencies": {
+		"@cloudflare/containers": "^0.0.19",
+		"hono": "4.8.2"
+	}
+}
