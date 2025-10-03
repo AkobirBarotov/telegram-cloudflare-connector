@@ -221,7 +221,7 @@ class TelegramConnector:
 
     async def _get_channel_messages(self):
         channel_messages = []
-        last_msg_ids = self.last_msg_id
+        last_msg_ids = self.last_msg_ids
 
         async for dialog in self.telegram.iter_dialogs(archived=False):
             try:
@@ -286,4 +286,4 @@ class TelegramConnector:
 
     def start(self):
         logging.info("Starting telegram connector...")
-        self.event_loop.run_until_complete(self._start())
+        return self.event_loop.run_until_complete(self._start())

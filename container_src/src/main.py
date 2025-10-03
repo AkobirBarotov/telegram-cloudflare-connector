@@ -11,22 +11,19 @@ app = Flask(__name__)
 
 @app.route("/")
 def run_connector():
-    data = request.get_json()
-    lastMessageIds = data.get("lastMessageIds")
-
-    if not lastMessageIds:
-        return jsonify({"error": "Missing required parameters"}), HTTPStatus.BAD_REQUEST
+    logging.info("Received request at '/' endpoint")
+    lastMessageIds = request.args.get("lastMessageIds") or {}
+    logging.debug(f"lastMessageIds received: {lastMessageIds}")
 
     telegram = get_telegram_client()
+    logging.info("Telegram client initialized")
 
     try:
         connector = TelegramConnector(telegram, lastMessageIds)
-        connector.start()
+        logging.info("TelegramConnector instance created")
+        messages = connector.start()
+        logging.info("Connector started and messages retrieved")
+        return jsonify(messages), HTTPStatus.OK
     except Exception as e:
-        logging.error(e)
+        logging.error(f"Error in run_connector: {e}")
         return jsonify({"error": str(e)}), HTTPStatus.INTERNAL_SERVER_ERROR
-
-    return jsonify({"status": "ok"}), HTTPStatus.OK
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)

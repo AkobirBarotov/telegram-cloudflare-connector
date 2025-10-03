@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.9-slim
 
 # Set workdir to project src
 WORKDIR /app
@@ -13,4 +13,4 @@ COPY container_src/src .
 
 EXPOSE 8080
 
-CMD ["python3", "main.py"]
+CMD ["gunicorn", "-b", "0.0.0.0:8080", "main:app"]
