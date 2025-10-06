@@ -11,6 +11,8 @@ from bs4 import BeautifulSoup
 from telethon import TelegramClient
 from telethon.tl.functions.messages import GetHistoryRequest
 
+from timescale import TimescaleClient
+
 
 class UserNotLoggedIn(Exception):
     pass
@@ -19,13 +21,13 @@ class UserNotLoggedIn(Exception):
 class TelegramConnector:
     def __init__(
         self,
-        telegram: TelegramClient,
-        last_msg_ids: dict = {},
+        timescale: TimescaleClient,
+        telegram: TelegramClient
     ):
         self.event_loop = get_event_loop()
 
+        self.timescale = timescale
         self.telegram = telegram
-        self.last_msg_ids = last_msg_ids
 
         current_dir = os.path.realpath(__file__)
         current_dir = os.path.dirname(current_dir)
@@ -33,6 +35,28 @@ class TelegramConnector:
 
         with open(schema_file_path) as schema_file:
             self.schema = json.loads(schema_file.read())
+
+    def _get_last_msg_ids(self):
+        sql = """
+        SELECT DISTINCT source_channel_id AS channel_id, MAX(CAST(platform_message_id AS INTEGER)) as last_msg_id
+        FROM message_feed
+        WHERE platform_name = 'telegram'
+        GROUP BY source_channel_id;
+        """
+        try:
+            with self.timescale.connection.cursor() as cur:
+                cur.execute(sql)
+                rows = cur.fetchall()
+
+            if not rows:
+                logging.info("No last messages found.")
+                return {}
+
+            last_msg_ids = {str(row[0]): int(row[1]) for row in rows}
+            return last_msg_ids
+        except Exception as e:
+            logging.error(f"Failed to fetch last message IDs: {e}")
+            return {}
 
     def _get_file_url_from_web_preview(self, url: str, type: str):
         try:
@@ -221,7 +245,7 @@ class TelegramConnector:
 
     async def _get_channel_messages(self):
         channel_messages = []
-        last_msg_ids = self.last_msg_ids
+        last_msg_ids = self._get_last_msg_ids()
 
         async for dialog in self.telegram.iter_dialogs(archived=False):
             try:
@@ -270,7 +294,7 @@ class TelegramConnector:
         if not glued_messages:
             return
         
-        return glued_messages
+        self.timescale.insert_messages_batch(glued_messages)
 
     async def _start(self):
         if not self.telegram.is_connected():
@@ -282,8 +306,7 @@ class TelegramConnector:
 
         logging.info("Getting user messages from channels...")
         messages = await self._get_channel_messages()
-        return messages
 
     def start(self):
         logging.info("Starting telegram connector...")
-        return self.event_loop.run_until_complete(self._start())
+        self.event_loop.run_until_complete(self._start())
