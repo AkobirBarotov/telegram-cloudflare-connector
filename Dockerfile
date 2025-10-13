@@ -4,12 +4,12 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Copy requirements first for caching
-COPY container_src/requirements.txt .
+COPY container/requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project code
-COPY container_src/src . 
+COPY container/src . 
 
 EXPOSE 8080
 

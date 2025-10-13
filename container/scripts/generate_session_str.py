@@ -34,7 +34,6 @@ async def main():
         }
 
         json_str = json.dumps(account_details, indent=4)
-        print("###### Add this to the Telegram account array: ######\n")
         print(json_str)
 
 
