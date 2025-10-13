@@ -11,12 +11,6 @@
   "triggers": {
     "crons": ["*/10 * * * *"]
   },
-  "kv_namespaces": [
-    {
-      "binding": "POINTERS",
-      "id": "1f13c4948b2d4189a7673c1767c36dbe"
-    }
-  ],
   "containers": [
     {
       "class_name": "MyContainer",
