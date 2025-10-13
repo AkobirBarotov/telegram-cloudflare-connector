@@ -41,7 +41,9 @@ Use dedicated account for testing. Follow [this guide](https://docs.telethon.dev
 
 Then generate session string using [container/scripts/generate_session_str.py](container/scripts/generate_session_str.py). Prior to executing the script, make sure to install [telethon](https://docs.telethon.dev/en/stable/basic/installation.html#installation).
 
-The script will request input for the `api_id` and `api_hash`. Additionally, it will ask for the phone number associated with the account, and a verification code will be sent to that number. You will find session string printed out in your terminal. Then you can add these three as Cloudflare Secrets: `TELEGRAM_API_ID`, `TELEGRAM_API_HASH` and `TELEGRAM_SESSION_STR`.
+The script will request input for the `api_id` and `api_hash`. Additionally, it will ask for the phone number associated with the account, and a verification code will be sent to that number. You will find session string printed out in your terminal. 
+
+Then you can add these three as Cloudflare Secrets: `TELEGRAM_API_ID`, `TELEGRAM_API_HASH` and `TELEGRAM_SESSION_STR`.
 
 ## Useful Resources
 
