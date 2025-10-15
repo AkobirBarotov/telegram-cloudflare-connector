@@ -1,4 +1,4 @@
-This service runs on Cloudflare Workers with containers. It retrieves new messages from a Telegram account every 10 minutes and stores them in a Timescale database. Consecutive messages from the same user within the same channel are merged into a single message by concatenating their text and retaining the metadata of the last message.
+This service runs on Cloudflare Workers with containers. It periodically retrieves new messages from Telegram and stores them in a Timescale database. Consecutive messages from the same author within the same channel are merged into a single message by concatenating their text and retaining the metadata of the last message.
 
 ## Timescale Setup
 [Create](https://console.cloud.timescale.com/signup) a Timescale database with their 30 days free trial. You will need to add connection string to `TIMESCALE_CONNECTION` secret.
