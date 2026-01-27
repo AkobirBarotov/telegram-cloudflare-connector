@@ -2,12 +2,12 @@ import { Container, getContainer } from "@cloudflare/containers";
 import { env } from "cloudflare:workers";
 
 export class MyContainer extends Container {
-  // Konteyner porti (Flask shu portda eshitadi)
+  // Container port (Flask listens on this port)
   defaultPort = 8080;
-  
-  // MUHIM O'ZGARISH: 
-  // Konteyner o'chib qolmasligi uchun vaqtni 10 soniyadan 10 daqiqaga cho'zamiz.
-  // Bu katta hajmdagi xabarlarni sinxronizatsiya qilishga imkon beradi.
+
+  // IMPORTANT CHANGE: 
+  // Extend time from 10s to 10m to prevent container termination.
+  // This allows synchronization of large volumes of messages.
   sleepAfter = "10m";
 
   envVars = {
@@ -22,12 +22,12 @@ export default {
   async scheduled(ctx, env) {
     try {
       console.log("[Worker] Scheduled event started. Waking up container...");
-      
+
       const url = "http://localhost:8080/";
-      // Konteyner nomini aniqlaymiz (agar env.CONTAINER bo'lmasa, default nom ishlatamiz)
+      // Determine container name (use default if env.CONTAINER is missing)
       const containerInstance = getContainer(env.CONTAINER || "telegram-connector-container", "telegram-worker-1");
 
-      // Konteynerga so'rov yuborish - bu uni "uyg'otadi" va main.py ni ishga tushiradi
+      // Send request to container - this "wakes it up" and runs main.py
       const resp = await containerInstance.fetch(url);
 
       if (!resp.ok) {
@@ -38,13 +38,13 @@ export default {
 
       const data = await resp.json();
       console.log("[Worker] Sync Success:", JSON.stringify(data));
-      
+
       return new Response("Sync Completed Successfully", { status: 200 });
 
     } catch (e) {
       console.error("[Worker] Critical Error in scheduled handler:", e);
-      // Xatolik bo'lsa ham 200 qaytaramizki, Cloudflare qayta-qayta retry qilib "spam" qilmasin,
-      // lekin logda error ko'rinadi.
+      // Return 200 even on error to prevent Cloudflare from retrying (spamming),
+      // but the error will be visible in the logs.
       return new Response(`Error: ${e.message}`, { status: 500 });
     }
   },
